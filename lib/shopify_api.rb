@@ -124,11 +124,20 @@ module ShopifyAPI
 
   # Shopify product
   class Product < ActiveResource::Base
+    
+    def url
+      "#{ActiveResource::Base.site.to_s.split("@")[1].split("/")[0]}/products/#{self.handle}"
+    end
 
     # Share all items of this store with the 
     # shopify marketplace
     def self.share; post :share;  end    
     def self.unshare; delete :share; end
+    
+    def self.fetch_all
+      # need to paginate
+      self.find(:all)
+    end
 
     # compute the price range
     def price_range
@@ -182,7 +191,7 @@ module ShopifyAPI
   
   class Blog < ActiveResource::Base
     def articles
-      Article.get
+      Article.find(:all, :params => {:blog_id => self.id})
     end
   end
   
