@@ -57,7 +57,7 @@ module ShopifyAPI
 
     # use this to initialize ActiveResource:
     # 
-    #  ActiveResource::Base.site = Shopify::Session.new(session[:shop], session[:t]).site
+    #  ShopifyAPI::Base.site = Shopify::Session.new(session[:shop], session[:t]).site
     #
     def site
       "#{protocol}://#{api_key}:#{computed_password}@#{url}/admin"
@@ -76,6 +76,8 @@ module ShopifyAPI
       Digest::MD5.hexdigest(secret + token.to_s)
     end
   end
+  
+  class Base < ActiveResource::Base
 
   # Shop object. Use Shop.current to receive 
   # the shop. Since you can only ever reference your own
@@ -83,33 +85,33 @@ module ShopifyAPI
   #
   class Shop
     def self.current
-      ActiveResource::Base.find(:one, :from => "/admin/shop.xml")
+      ShopifyAPI::Base.find(:one, :from => "/admin/shop.xml")
     end
   end               
 
   # Custom collection
   #
-  class CustomCollection < ActiveResource::Base
+  class CustomCollection < ShopifyAPI::Base
   end                                                                 
 
-  class ShippingAddress < ActiveResource::Base
+  class ShippingAddress < ShopifyAPI::Base
   end
 
-  class BillingAddress < ActiveResource::Base
+  class BillingAddress < ShopifyAPI::Base
     def name
       "#{first_name} #{last_name}"
     end
   end         
 
-  class LineItem < ActiveResource::Base 
+  class LineItem < ShopifyAPI::Base 
   end       
 
-  class ShippingLine < ActiveResource::Base
+  class ShippingLine < ShopifyAPI::Base
   end  
 
   # Order model
   #
-  class Order < ActiveResource::Base  
+  class Order < ShopifyAPI::Base  
 
     def close; load_attributes_from_response(post(:close)); end
 
@@ -123,10 +125,10 @@ module ShopifyAPI
   end
 
   # Shopify product
-  class Product < ActiveResource::Base
+  class Product < ShopifyAPI::Base
     
     def url
-      "#{ActiveResource::Base.site.to_s.split("@")[1].split("/")[0]}/products/#{self.handle}"
+      "#{ShopifyAPI::Base.site.to_s.split("@")[1].split("/")[0]}/products/#{self.handle}"
     end
 
     # Share all items of this store with the 
@@ -151,11 +153,11 @@ module ShopifyAPI
     end
   end
   
-  class Variant < ActiveResource::Base
+  class Variant < ShopifyAPI::Base
     self.prefix = "/admin/products/:product_id/"
   end
   
-  class Image < ActiveResource::Base
+  class Image < ShopifyAPI::Base
     self.prefix = "/admin/products/:product_id/"
     
     # generate a method for each possible image variant
@@ -170,7 +172,7 @@ module ShopifyAPI
     end
   end
 
-  class Payment < ActiveResource::Base    
+  class Payment < ShopifyAPI::Base    
     self.prefix = "/admin/orders/:order_id/"    
   end                  
   
@@ -180,26 +182,26 @@ module ShopifyAPI
   class Authorization < Payment
   end
   
-  class Order < ActiveResource::Base    
+  class Order < ShopifyAPI::Base    
   end
 
-  class Country < ActiveResource::Base
+  class Country < ShopifyAPI::Base
   end
 
-  class Page < ActiveResource::Base
+  class Page < ShopifyAPI::Base
   end
   
-  class Blog < ActiveResource::Base
+  class Blog < ShopifyAPI::Base
     def articles
       Article.find(:all, :params => {:blog_id => self.id})
     end
   end
   
-  class Article < ActiveResource::Base
+  class Article < ShopifyAPI::Base
     self.prefix = "/admin/blogs/:blog_id/"
   end
 
-  class Province < ActiveResource::Base
+  class Province < ShopifyAPI::Base
     self.prefix = "/admin/countries/:country_id/"
   end
 end
