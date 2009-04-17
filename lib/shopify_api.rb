@@ -78,6 +78,7 @@ module ShopifyAPI
   end
   
   class Base < ActiveResource::Base
+  end
 
   # Shop object. Use Shop.current to receive 
   # the shop. Since you can only ever reference your own
@@ -85,33 +86,33 @@ module ShopifyAPI
   #
   class Shop
     def self.current
-      ShopifyAPI::Base.find(:one, :from => "/admin/shop.xml")
+      Base.find(:one, :from => "/admin/shop.xml")
     end
   end               
 
   # Custom collection
   #
-  class CustomCollection < ShopifyAPI::Base
+  class CustomCollection < Base
   end                                                                 
 
-  class ShippingAddress < ShopifyAPI::Base
+  class ShippingAddress < Base
   end
 
-  class BillingAddress < ShopifyAPI::Base
+  class BillingAddress < Base
     def name
       "#{first_name} #{last_name}"
     end
   end         
 
-  class LineItem < ShopifyAPI::Base 
+  class LineItem < Base 
   end       
 
-  class ShippingLine < ShopifyAPI::Base
+  class ShippingLine < Base
   end  
 
   # Order model
   #
-  class Order < ShopifyAPI::Base  
+  class Order < Base  
 
     def close; load_attributes_from_response(post(:close)); end
 
@@ -125,10 +126,10 @@ module ShopifyAPI
   end
 
   # Shopify product
-  class Product < ShopifyAPI::Base
+  class Product < Base
     
     def url
-      "#{ShopifyAPI::Base.site.to_s.split("@")[1].split("/")[0]}/products/#{self.handle}"
+      "#{Base.site.to_s.split("@")[1].split("/")[0]}/products/#{self.handle}"
     end
 
     # Share all items of this store with the 
@@ -153,11 +154,11 @@ module ShopifyAPI
     end
   end
   
-  class Variant < ShopifyAPI::Base
+  class Variant < Base
     self.prefix = "/admin/products/:product_id/"
   end
   
-  class Image < ShopifyAPI::Base
+  class Image < Base
     self.prefix = "/admin/products/:product_id/"
     
     # generate a method for each possible image variant
@@ -172,7 +173,7 @@ module ShopifyAPI
     end
   end
 
-  class Payment < ShopifyAPI::Base    
+  class Payment < Base    
     self.prefix = "/admin/orders/:order_id/"    
   end                  
   
@@ -182,26 +183,26 @@ module ShopifyAPI
   class Authorization < Payment
   end
   
-  class Order < ShopifyAPI::Base    
+  class Order < Base    
   end
 
-  class Country < ShopifyAPI::Base
+  class Country < Base
   end
 
-  class Page < ShopifyAPI::Base
+  class Page < Base
   end
   
-  class Blog < ShopifyAPI::Base
+  class Blog < Base
     def articles
       Article.find(:all, :params => {:blog_id => self.id})
     end
   end
   
-  class Article < ShopifyAPI::Base
+  class Article < Base
     self.prefix = "/admin/blogs/:blog_id/"
   end
 
-  class Province < ShopifyAPI::Base
+  class Province < Base
     self.prefix = "/admin/countries/:country_id/"
   end
 end
