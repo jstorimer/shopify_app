@@ -78,6 +78,47 @@ module ShopifyAPI
   end
   
   class Base < ActiveResource::Base
+    def self.find_each(options = {})
+      find_in_batches(options) do |records|
+        records.each { |record| yield record }
+      end
+
+      self
+    end
+
+    def self.find_in_batches(options = {})
+      page = 1
+      limit = options.delete(:limit) || 100
+
+      objects = find(:all, :params => {:page => page, :limit => limit})
+
+      while objects.any?
+        yield objects
+
+        break if objects.size < limit
+        page += 1
+        objects = find(:all, :params => {:page => page, :limit => limit})
+      end
+    end
+    
+    def self.count(options = {})
+      count = 0
+      
+      page = 1
+      limit = options.delete(:limit) || 100
+
+      objects = find(:all, :params => {:page => page, :limit => limit})
+      count += objects.size
+
+      while objects.any?
+        break if objects.size < limit
+        page += 1
+        objects = find(:all, :params => {:page => page, :limit => limit})
+        count += objects.size
+      end
+      
+      count
+    end
   end
 
   # Shop object. Use Shop.current to receive 
